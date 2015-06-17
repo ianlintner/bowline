@@ -1,6 +1,8 @@
 # Docker for Drupal development and testing
 ## This is a fork of bowline targeted at developers using acquia as their production instance.
 
+Added additional development tools from php-essentials docker container.
+
 ## Requirements
 1. [Docker](https://www.docker.com/)
   - Make sure you can successfully run docker commands without sudo. See [Ubuntu example](https://docs.docker.com/installation/ubuntulinux/#giving-non-root-access).
