@@ -1,5 +1,7 @@
 # Docker for Drupal development and testing
 
+Added additional development tools from php-essentials docker container.
+
 ## Requirements
 1. [Docker](https://www.docker.com/)
   - Make sure you can successfully run docker commands without sudo. See [Ubuntu example](https://docs.docker.com/installation/ubuntulinux/#giving-non-root-access).
