@@ -3,8 +3,9 @@
 # - also includes Apache, Composer, Drupal configuration
 #
 
-FROM debian:wheezy
-MAINTAINER David Numan <david.numan@civicactions.com>
+# Set the base image to Ubuntu
+FROM ubuntu:precise
+MAINTAINER Ian Lintner <lintner.ian@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -13,11 +14,13 @@ RUN dpkg-divert --local --rename --add /sbin/initctl
 RUN ln -sf /bin/true /sbin/initctl
 
 # Packages.
-RUN apt-get update && \
-  apt-get -y install git mysql-client apache2 libapache2-mod-php5 wget curl \
-    php5-curl php5-gd php5-mysql php5-sqlite php5-pgsql php-apc php-pear php5-xdebug \
-    pwgen sudo python-setuptools nano apt-utils tidy vim pv && \
+RUN apt-get clean all
+RUN apt-get update --fix-missing
+RUN apt-get -y install git mysql-client apache2 libapache2-mod-php5 wget curl \
+    php5-curl php5-gd php5-mysql php5-sqlite php5-pgsql php-pear php5-dev php-apc php5-xdebug make libpcre3-dev \
+    pwgen sudo python-setuptools nano apt-utils tidy vim && \
   apt-get autoclean && apt-get autoremove
+
 
 # whitelist = phar
 RUN \
@@ -29,8 +32,13 @@ RUN \
   curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin -d detect_unicode=0 && \
   ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
 
+RUN pecl install uploadprogress
+RUN echo "extension = uploadprogress.so" > /etc/php5/apache2/conf.d/php.ini
+
 # Enable a2enmod rewrite
 RUN a2enmod rewrite php5
+
+
 
 # Sudo.
 RUN echo %sudo	ALL=NOPASSWD: ALL >> /etc/sudoers
@@ -54,11 +62,11 @@ ADD ./conf/drupal/settings.docker.php /etc/settings.docker.php
 
 # Xdebug settings.
 RUN \
-  echo xdebug.remote_enable=1 >> /etc/php5/mods-available/xdebug.ini && \
-  echo xdebug.remote_connect_back=1 >> /etc/php5/mods-available/xdebug.ini && \
-  echo xdebug.remote_autostart=0 >> /etc/php5/mods-available/xdebug.ini && \
-  echo xdebug.max_nesting_level=256 >> /etc/php5/mods-available/xdebug.ini && \
-  echo xdebug.remote_log=/var/www/logs/xdebug.log >> /etc/php5/mods-available/xdebug.ini
+  echo xdebug.remote_enable=1 >> /etc/php5/apache2/php.ini && \
+  echo xdebug.remote_connect_back=1 >> /etc/php5/apache2/php.ini && \
+  echo xdebug.remote_autostart=0 >> /etc/php5/apache2/php.ini && \
+  echo xdebug.max_nesting_level=256 >> /etc/php5/apache2/php.ini && \
+  echo xdebug.remote_log=/var/www/logs/xdebug.log >> /etc/php5/apache2/php.ini
 
 EXPOSE 80
 
